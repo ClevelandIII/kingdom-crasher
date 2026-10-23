@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: "pixel";
+    src: url("assets/pixellocale-v-1-4.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@theme {
+    --font-pixel: "pixel", "serif";
+}
+
+* {
+    border-radius: 25px;
+    font-family: "pixel", "serif";
+}
+
+main {
+    height: 100vh;
+}
+
+button {
+    border: 3px solid black;
+}
+
+.hide {
+    opacity: 10%;
+}
+
+.show {
+    cursor: pointer;
+}
+
+#attack {
+    border-radius: 9999px;
+}
+
+#overflow {
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+aside {
+    max-height: 97vh;
+}
