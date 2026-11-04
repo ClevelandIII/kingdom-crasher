@@ -26,13 +26,13 @@ export default function location(
     let text: string = "";
     //console.log(player.positionX);
 
-    if (player.positionX < 6) {
+    if (player.positionX < 5) {
         updateLocation("Grasslands");
-    } else if (player.positionX < 11) {
+    } else if (player.positionX < 10) {
         updateLocation("Rainforest");
-    } else if (player.positionX < 16) {
+    } else if (player.positionX < 15) {
         updateLocation("Rocky Mountains");
-    } else if (player.positionX < 21) {
+    } else if (player.positionX < 20) {
         updateLocation("Volcana");
     } else {
         updateLocation("Courtyard");

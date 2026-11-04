@@ -15,7 +15,7 @@ export type Player = {
     positionX: number;
     positionY: number;
     baseDamage: number;
-    state: "NORMAL" | "FIGHT" | "DEATH" | "WIN";
+    state: "NORMAL" | "FIGHT" | "DEATH" | "WIN" | "DIALOGUE";
     location:
         | "Grasslands"
         | "Rainforest"
@@ -24,4 +24,11 @@ export type Player = {
         | "Courtyard";
     weapon: Weapon[];
     //currentEnemy: Enemy
+    flag: number;
 };
+
+export type Quest = {
+    name: string;
+    description: string;
+    inventory: number;
+}

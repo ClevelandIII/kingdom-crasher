@@ -5,9 +5,12 @@ import Movement from "../components/Movement";
 import LocationText from "../components/LocationText";
 import Dialogue from "../components/Dialogue";
 import type { Enemy } from "../objects/Fight";
+import type { Quest } from "../objects/Player";
+import QuestUI from "../components/Quest";
+import AttackButtons from "../components/AttackButtons";
 
 function App() {
-    const [map, setMap] = useState<number[][]>([
+    const map: number[][] = [
         [
             0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
             0, 0,
@@ -20,7 +23,7 @@ function App() {
             0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
             0, 0,
         ],
-    ]);
+    ];
 
     const [player, setPlayer] = useState<Player>({
         name: "Penny",
@@ -35,6 +38,7 @@ function App() {
         location: "Grasslands",
         weapon: [{ name: "Rubber Bullets", damage: 5 }],
         baseDamage: 5,
+        flag: 0,
     });
 
     const [enemy, setEnemy] = useState<Enemy>({
@@ -43,6 +47,13 @@ function App() {
         experience: 0,
         gold: 0,
         name: "None",
+        quest: 0,
+    });
+
+    const [quest, setQuest] = useState<Quest>({
+        name: "None",
+        description: "None",
+        inventory: 0,
     });
 
     const [dialogue, setDialogue] = useState<string[]>(["Let's Begin."]);
@@ -63,7 +74,9 @@ function App() {
         }
     }
 
-    function updateState(state: "NORMAL" | "DEATH" | "FIGHT" | "WIN"): void {
+    function updateState(
+        state: "NORMAL" | "DEATH" | "FIGHT" | "WIN" | "DIALOGUE",
+    ): void {
         //console.log("here!!!!" + " " + state + " " + player.state);
 
         if (state != player.state) {
@@ -76,6 +89,15 @@ function App() {
     }
 
     function updateDialogue(input: string): void {
+        const container = document.getElementById("overflow");
+
+        if (container == null) {
+            throw new Error("Container 'overflow' is somehow null");
+        }
+        console.log(container.scrollTop + " " + container.scrollHeight);
+
+        container.scrollTop = container.scrollHeight;
+
         setDialogue([...dialogue, input]);
     }
 
@@ -102,11 +124,11 @@ function App() {
         let l: number = input.level;
 
         while (e >= 20 * l) {
-            mH = parseFloat((input.maxHealth * 1.1).toFixed(2));
-            h = parseFloat((input.maxHealth * 1.1).toFixed(2));
-            e = input.experience - 20 * input.level;
-            bD = parseFloat((input.baseDamage * 1.1).toFixed(2));
-            l = input.level + 1;
+            mH = Math.ceil(parseFloat((mH * 1.1).toFixed(2)));
+            h = mH;
+            e = e - 20 * l;
+            bD = parseFloat((bD * 1.1).toFixed(2));
+            l = l + 1;
         }
 
         return {
@@ -133,6 +155,7 @@ function App() {
             location: "Grasslands",
             weapon: [{ name: "Rubber Bullets", damage: 5 }],
             baseDamage: 5,
+            flag: 0,
         });
         setEnemy({
             health: 1,
@@ -140,33 +163,56 @@ function App() {
             experience: 0,
             gold: 0,
             name: "None",
+            quest: 0,
         });
         setDialogue(["Let's Begin."]);
     }
 
     function updatePlayer(input: Player) {
+        console.log(JSON.stringify(input));
         const newPlayer = levelUp(input);
-        //console.log(JSON.stringify(newPlayer));
+        console.log(JSON.stringify(newPlayer));
 
         setPlayer(newPlayer);
+        console.log(JSON.stringify(player));
+    }
+
+    function updateQuest(input: Quest) {
+        setQuest(input);
     }
 
     return (
         <>
-            <main className="w-3/5 grid m-auto grid-cols-3 gap-3 py-3">
-                <section className="border-3 w-full h-full m-auto text-center p-3 grid grid-cols-1 gap-3 row-cols-4 col-span-2">
-                    <div className="row-span-3 h-full">
+            <main className="w-3/5 grid m-auto grid-cols-6 gap-3">
+                <section className="border-3 w-full h-full m-auto text-center p-3 grid grid-cols-1 gap-3 col-span-4 grid-rows-3">
+                    <div className="h-full row-span-2">
                         <Screen
                             player={player}
                             enemy={enemy}
                             resetAll={resetAll}
                             updateState={updateState}
+                            map={map}
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 row-span-1 h-full">
-                        <Movement
-                            map={map}
+                    <div className="grid grid-cols-2 gap-3 h-full row-span-1">
+                        <div id="movement" className="m-auto">
+                            <Movement
+                                map={map}
+                                player={player}
+                                enemy={enemy}
+                                updateLocation={updateLocation}
+                                updateState={updateState}
+                                updateDialogue={updateDialogue}
+                                updateHealth={updateHealth}
+                                updateEnemy={updateEnemy}
+                                updatePlayer={updatePlayer}
+                                updateQuest={updateQuest}
+                                quest={quest}
+                            />
+                        </div>
+
+                        <AttackButtons
                             player={player}
                             enemy={enemy}
                             updateLocation={updateLocation}
@@ -175,14 +221,27 @@ function App() {
                             updateHealth={updateHealth}
                             updateEnemy={updateEnemy}
                             updatePlayer={updatePlayer}
+                            updateQuest={updateQuest}
+                            quest={quest}
                         />
                     </div>
                 </section>
-                <aside className="w-full h-full m-auto text-center grid grid-cols-1 gap-3 row-cols-35">
-                    <LocationText
-                        player={player}
-                        updateLocation={updateLocation}
-                    />
+                <aside className="w-full h-full m-auto text-center flex flex-col gap-3 col-span-2">
+                    <div>
+                        <LocationText
+                            player={player}
+                            updateLocation={updateLocation}
+                        />
+                    </div>
+
+                    {quest.name == "None" ? (
+                        <></>
+                    ) : (
+                        <div>
+                            <QuestUI quest={quest} />
+                        </div>
+                    )}
+
                     <Dialogue
                         updateDialogue={updateDialogue}
                         dialogue={dialogue}

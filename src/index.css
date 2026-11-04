@@ -15,13 +15,44 @@
     border-radius: 25px;
     font-family: "pixel", "serif";
 }
+#root {
+    margin: 0 auto;
+    height: 100vh;
+    max-height: 100vh;
+    display: flex;
+}
 
 main {
-    height: 100vh;
+    height: 95%;
+    max-height: 95%;
 }
 
 button {
     border: 3px solid black;
+}
+
+#movement button {
+    border-radius: 0;
+}
+
+#up {
+    border-bottom: none;
+}
+
+#left {
+    border-right: none;
+}
+
+#right {
+    border-left: none;
+}
+
+#down {
+    border-top: none;
+}
+
+#middle {
+    border: none;
 }
 
 .hide {
@@ -32,15 +63,32 @@ button {
     cursor: pointer;
 }
 
-#attack {
-    border-radius: 9999px;
-}
-
 #overflow {
+    flex-grow: 1;
     overflow-x: hidden;
     overflow-y: scroll;
+    height: 200px;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
-aside {
-    max-height: 97vh;
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 25px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: none;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: oklch(80.9% 0.105 251.813);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #000000;
 }

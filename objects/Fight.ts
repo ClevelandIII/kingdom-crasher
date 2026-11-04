@@ -1,5 +1,6 @@
 import type { Player } from "./Player";
 import React from "react";
+import type { Quest } from "./Player";
 
 export type Enemy = {
     health: number;
@@ -7,20 +8,12 @@ export type Enemy = {
     gold: number;
     experience: number;
     name: string;
+    quest: number;
 };
 
 // export type Thief = Enemy & {
 //     name: "Thief";
 // };
-
-function scroll(id: string): void {
-    const scroll = document.getElementById(id);
-    if (scroll == null) {
-        throw new Error("Not an element");
-    } else {
-        scroll.scrollTop = scroll.scrollHeight; // Scrolls to the bottom instantly
-    }
-}
 
 export function initFight(updateEnemy: (input: Enemy) => void) {
     //console.log("test");
@@ -35,8 +28,9 @@ export function initFight(updateEnemy: (input: Enemy) => void) {
         health: 15 * statsMultiplier,
         gold: 5 * statsMultiplier,
         damage: 5 * statsMultiplier,
-        experience: 500 * statsMultiplier,
+        experience: 20 * statsMultiplier,
         name: "Thief",
+        quest: 100 * statsMultiplier,
     });
 }
 
@@ -46,10 +40,14 @@ function deathCheck(
     player: Player,
     enemy: Enemy,
     updateDialogue: (input: string) => void,
-    updateState: (state: "NORMAL" | "DEATH" | "FIGHT" | "WIN") => void,
+    updateState: (
+        state: "NORMAL" | "DEATH" | "FIGHT" | "WIN" | "DIALOGUE",
+    ) => void,
     updateHealth: (penny: number, enemy: number) => void,
     updatePlayer: (input: Player) => void,
     updateEnemy: (input: Enemy) => void,
+    updateQuest: (input: Quest) => void,
+    quest: Quest,
 ): boolean {
     console.log(player.health);
 
@@ -71,6 +69,11 @@ function deathCheck(
             ...enemy,
             name: "None",
         });
+        updateQuest({
+            ...quest,
+            inventory: parseFloat((quest.inventory += enemy.quest).toFixed(2)),
+        });
+
         console.log("here!");
 
         return false;
@@ -85,9 +88,13 @@ export default function fight(
     enemy: Enemy,
     updateDialogue: (input: string) => void,
     updateHealth: (input1: number, input2: number) => void,
-    updateState: (state: "NORMAL" | "DEATH" | "FIGHT" | "WIN") => void,
+    updateState: (
+        state: "NORMAL" | "DEATH" | "FIGHT" | "WIN" | "DIALOGUE",
+    ) => void,
     updatePlayer: (input: Player) => void,
     updateEnemy: (input: Enemy) => void,
+    updateQuest: (input: Quest) => void,
+    quest: Quest,
 ) {
     if (player.health <= 0) {
         updateDialogue(`Penny has fallen... Retry?`);
@@ -123,13 +130,14 @@ export default function fight(
             updateHealth,
             updatePlayer,
             updateEnemy,
+            updateQuest,
+            quest,
         );
 
         if (alive) {
             updateDialogue(
                 `Penny dealt ${pDamage} damage to the Thief! Enemy dealt ${eDamage} damage to Penny!`,
             );
-            scroll("overflow");
         }
     }
 }

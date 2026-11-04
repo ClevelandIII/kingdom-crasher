@@ -1,11 +1,13 @@
 import type { Player } from "../objects/Player";
 import type { Enemy } from "../objects/Fight";
+import { resetButtons } from "../objects/ButtonReset";
 
 type Props = {
     player: Player;
     enemy: Enemy;
     resetAll: () => void;
-    updateState: (state: "NORMAL" | "DEATH" | "FIGHT" | "WIN") => void;
+    updateState: (state: "NORMAL" | "DEATH" | "FIGHT" | "WIN" | "DIALOGUE") => void;
+    map: number[][];
 };
 
 export default function Screen({
@@ -13,6 +15,7 @@ export default function Screen({
     enemy,
     resetAll,
     updateState,
+    map,
 }: Props) {
     return (
         <>
@@ -24,7 +27,10 @@ export default function Screen({
 
                             <button
                                 className="cursor-pointer"
-                                onClick={resetAll}
+                                onClick={() => {
+                                    resetAll;
+                                    resetButtons(player, map);
+                                }}
                             >
                                 Restart
                             </button>
@@ -40,13 +46,15 @@ export default function Screen({
                             </h1>
 
                             <p>
-                                Gained {enemy.experience} experience and {enemy.gold} gold!
+                                Gained {enemy.experience} experience and{" "}
+                                {enemy.gold} gold!
                             </p>
 
                             <button
                                 className="cursor-pointer"
                                 onClick={() => {
                                     updateState("NORMAL");
+                                    resetButtons(player, map);
                                 }}
                             >
                                 Continue
@@ -59,12 +67,8 @@ export default function Screen({
                     <div className="border-3 w-full h-full m-auto grid grid-cols-1 gap-3">
                         <div>
                             <ul className="flex justify-evenly">
-                                <li>Name: {player.name}</li>
-                                <li>Health: {player.health}</li>
+                                <li>Health: {player.health}/{player.maxHealth}</li>
                                 <li>Level: {player.level}</li>
-                                <li>Experience: {player.experience}</li>
-                                <li>Gold: {player.gold}</li>
-                                <li>State: {player.state}</li>
                             </ul>
                         </div>
                         {enemy.name == "None" ? (
